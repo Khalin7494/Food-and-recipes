@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Successful registration
+{% endblock %}
+
+{% block main %}
+    <img class="border img-fluid" src="static/successful.jpg" alt="Confirmation required correct" style="height: 500px;">
+    <p>In 3 seconds you will be redirected to the login page.</p>
+    <meta http-equiv="refresh" content="3;url=/login">
+{% endblock %}

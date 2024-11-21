@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    User exist
+{% endblock %}
+
+{% block main %}
+    <img class="border img-fluid" src="static/userexist.jpg" alt="Confirmation required correct" style="height: 500px;">
+    <p>In 4 seconds you will be redirected to the registration page.</p>
+    <meta http-equiv="refresh" content="4;url=/register">
+{% endblock %}

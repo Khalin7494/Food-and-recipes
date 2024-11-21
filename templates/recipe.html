@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+
+{% block meta_tags %}
+    <meta property="og:url" content="{{ url_for('recipe_detail', recipe_id=recipe.id, _external=True) }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{ recipe.title }}" />
+    <meta property="og:description" content="{{ recipe.description }}" />
+    <meta property="og:image" content="{{ recipe.image_url }}" />
+{% endblock %}
+
+{% block title %}
+    Recipe
+{% endblock %}
+
+{% block main %}
+
+        <div class="container-fluid p-0">
+            <img src="/static/logo2.jpg" alt="Large Image" class="img-fluid w-100" style="object-fit: cover; height: 300px;">
+        </div>
+
+
+        <div id="recipe-container" class="container my-4">
+            {% if recipe %}
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h1 class="card-title">{{ recipe.label }}</h1>
+                                <p><a href="{{ recipe.url }}" target="_blank" class="text-secondary">Source: {{ recipe.source }}</a></p>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center" style="height: 400px;">
+                                <img src="{{ recipe.image }}" class="rounded" alt="Recipe Image" style="width: 400px; height: 400px;">
+                            </div>
+                            <div class="card-body text-center">
+                                {% if recipe.totalTime %}
+                                    <h3>Cooking time:
+                                        <span class="text-warning bg-dark">
+                                            {% if (recipe.totalTime // 60) > 0 %}
+                                                {% if (recipe.totalTime % 60) > 0 %}
+                                                    {{ (recipe.totalTime // 60) | int }} hours {{ (recipe.totalTime % 60) | int }} minutes
+                                                {% else %}
+                                                    {{ (recipe.totalTime // 60) | int }} hours
+                                                {% endif %}
+                                            {% else %}
+                                                {{ recipe.totalTime | int }} minutes
+                                            {% endif %}
+                                        </span>
+                                    </h3>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <div class="card-body text-left" style="width: 50%;">
+                                    <h3>Ingredients:</h3>
+                                    <ul class="list-unstyled">
+                                        {% for ingredient in recipe.ingredientLines %}
+                                            <li>{{ ingredient }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <div class="card-body">
+                                        {% if recipe.dietLabels %}
+                                            <details>
+                                                <summary style="font-size: 1.5rem;">Type of diet</summary>
+                                                <ul class="list-unstyled">
+                                                    {% for item in recipe.dietLabels %}
+                                                        <li>{{ item }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </details>
+                                        {% endif %}
+
+                                        {% if recipe.healthLabels %}
+                                            <details>
+                                                <summary style="font-size: 1.5rem;">Health labels</summary>
+                                                <ul class="list-unstyled">
+                                                    {% for item in recipe.healthLabels %}
+                                                        <li>{{ item }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </details>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-body" style="width: 50%;">
+                                    {% if recipe.yield %}
+                                        <h3>Number of servings: <p class="text-warning bg-dark">{{ recipe.yield | int }}</p></h3>
+                                    {% endif %}
+
+                                    {% if recipe.totalNutrients %}
+                                        <h3>Nutrition (per serving):</h3>
+                                        <div class="d-flex justify-content-left flex-wrap">
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">Calories</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">{{ (recipe.totalNutrients.ENERC_KCAL.quantity / recipe.yield) | round }} kcal</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">Fat</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">{{ (recipe.totalNutrients.FAT.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">Carbs</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">{{ (recipe.totalNutrients.CHOCDF.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">Protein</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.25rem;">{{ (recipe.totalNutrients.PROCNT.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if recipe.cuisineType %}
+                                        <h3 class="container my-2">Type of cuisine: <p class="text-warning bg-dark">{{ recipe.cuisineType[0] }}</p></h3>
+                                    {% endif %}
+
+                                    {% if recipe.mealType %}
+                                        <h3>Type of meal: <p class="text-warning bg-dark">{{ recipe.mealType[0] }}</p></h3>
+                                    {% endif %}
+
+                                    {% if recipe.dishType %}
+                                        <h3>Type of dish: <p class="text-warning bg-dark">{{ recipe.dishType[0] }}</p></h3>
+                                    {% endif %}
+
+
+                                    <h3>Save to favorites:</h3>
+                                    <form id="like-form" action="{% if recipe_exists %}/delete_favorite/{{ recipe_id }}{% else %}/save_favorite/{{ recipe_id }}{% endif %}" method="POST">
+                                        <button id="like-button" type="submit" class="heart-button {{ 'active' if recipe_exists else '' }}" data-recipe-id="{{ recipe_id }}">
+                                            <i class="heart-icon far fa-heart {{ 'd-none' if recipe_exists else '' }}"></i>
+                                            <i class="heart-icon fas fa-heart {{ '' if recipe_exists else 'd-none' }}"></i>
+                                        </button>
+                                    </form>
+                                    <!-- Flash messages -->
+                                    <div id="flash-message" class="alert d-none mt-2" role="alert"></div>
+
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('recipe_detail', recipe_id=recipe_id, _external=True) }}"
+                                        target="_blank" class="facebook-share-btn">
+                                        <img src="{{ url_for('static', filename='facebook-48.png') }}" alt="Facebook Icon" class="facebook-icon">
+                                        Share on Facebook
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>No recipe found. Please try again later.</p>
+            {% endif %}
+        </div>
+
+{% endblock %}
+
+{% block script %}
+
+    <script src="{{ url_for('static', filename='js/favorite.js') }}"></script>
+
+{% endblock %}

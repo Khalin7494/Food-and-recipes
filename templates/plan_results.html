@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Meal Plan Results
+{% endblock %}
+
+{% block main %}
+
+<h1>Your Meal Plan</h1>
+
+<button onclick="window.location.href='/create_meal_plan'" class="btn btn-primary mb-3">Create a new meal plan</button>
+<button id="save-plan-button" type="button" class="btn btn-secondary mb-3">Save this meal plan</button>
+
+<!-- Flash message for meal plan saving -->
+<div id="meal-plan-flash-message" class="alert alert-success d-none mt-2" role="alert"></div>
+
+{% if recipes %}
+
+    {% for day_number, day_recipes in recipes|groupby("day_number") %}
+        <div class="mb-4">
+            <h2 class="display-4">Day {{ day_number }}</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for recipe in day_recipes %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm justify-content-center align-items-center">
+                            <a href="{{ url_for('recipe_detail', recipe_id=recipe.recipe_id) }}">
+                                <img src="data:image/{{ image_type }};base64,{{ recipe.image }}" class="card-img-top" alt="{{ recipe['label'] }}" style="width: 300px; height: auto;">
+                            </a>
+                            <div class="card-body">
+                                <h3 class="card-title mb-3">{{ recipe.label }}</h3>
+
+                                <a href="{{ url_for('recipe_detail', recipe_id=recipe.recipe_id) }}" class="btn btn-outline-success mt-2 w-50">View full recipe</a>
+
+                                <div class="d-flex justify-content-around mt-3">
+                                    <h4 class="text-warning bg-dark">
+                                        {{ recipe.meal }}{% if recipe.dish %} : {{ recipe.dish }}{% endif %}
+                                    </h4>
+                                </div>
+
+                                {% if recipe.yield %}
+                                        <h4>Number of servings: <p class="text-warning bg-dark mt-2">{{ recipe.yield | round }}</p></h4>
+                                {% endif %}
+
+                                {% if recipe.totalNutrients %}
+                                        <h4>Nutrition (per serving):</h4>
+                                        <div class="d-flex justify-content-left flex-wrap">
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">Calories</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">{{ (recipe.totalNutrients.ENERC_KCAL.quantity / recipe.yield) | round }} kcal</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">Fat</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">{{ (recipe.totalNutrients.FAT.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">Carbs</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">{{ (recipe.totalNutrients.CHOCDF.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                            <div class="nutrition-item text-center">
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">Protein</p>
+                                                <p class="text-warning bg-dark" style="font-size: 1.1rem;">{{ (recipe.totalNutrients.PROCNT.quantity / recipe.yield) | round }} g</p>
+                                            </div>
+                                        </div>
+                                {% endif %}
+                                <a href="{{ recipe.url }}" target="_blank" class="btn btn-outline-secondary mt-2 w-50">Recipe source</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/meal_plan.js') }}"></script>
+{% endblock %}
