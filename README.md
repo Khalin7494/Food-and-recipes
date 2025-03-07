@@ -1,7 +1,5 @@
 # Food and Recipes Web Application
 
-## Video Demo:  https://youtu.be/iZrxJhOQRcE?si=liBAcYtcuxjbfH8s
-
 ## Description:
 Recipe Planner Web Application is a comprehensive tool designed to simplify meal planning for users by enabling them to search for recipes, save their favorites, and generate personalized meal plans. The project focuses on usability and functionality, offering an intuitive interface and features tailored to user needs.
 
